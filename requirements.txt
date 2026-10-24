@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+pyjwt
+bcrypt
+mysql-connector-python
+pymongo
+redis
+python-dotenv

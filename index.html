@@ -1,0 +1,180 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PitchSide · Live Cricket Platform</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{--g:#b8860b;--g2:#e8c963;--ink:#3b2f0b;--mut:#8a7a4a;--line:#ecdfae}
+*{box-sizing:border-box}body{margin:0;font-family:Segoe UI,system-ui,sans-serif;color:var(--ink);background:linear-gradient(180deg,#fff8e6,#fff 50%);min-height:100vh}
+header{position:sticky;top:0;z-index:9;display:flex;gap:14px;align-items:center;padding:10px 24px;background:rgba(255,248,230,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.brand{font-weight:800;font-size:1.3rem}.brand b{color:var(--g)}nav{display:flex;gap:4px;flex:1;flex-wrap:wrap}
+nav button,.btn{border:1px solid var(--line);background:#fff;color:var(--ink);padding:8px 14px;border-radius:10px;cursor:pointer;font-weight:600}
+nav button.on,.btn.p{background:linear-gradient(120deg,#c9a227,#e8c963);border-color:#c9a227}nav button:hover,.btn:hover{border-color:var(--g)}
+main{max-width:1180px;margin:auto;padding:22px}.hero{padding:26px 30px;border-radius:20px;margin-bottom:18px;background:linear-gradient(120deg,#c9a227,#e8c963 55%,#f6e3a1);box-shadow:0 6px 18px rgba(184,134,11,.25)}
+.hero h1{margin:0;font-size:2rem}.hero p{margin:4px 0 0;color:#5a4a15}.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 20px;box-shadow:0 2px 10px rgba(184,134,11,.12)}
+.lbl{color:var(--mut);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase}.kpi{font-size:2rem;font-weight:800}.score{font-size:3rem;font-weight:800;line-height:1.1}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}th{color:var(--mut);font-size:.75rem;text-transform:uppercase}
+select,input{padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+.chip{display:inline-block;width:38px;height:38px;line-height:38px;text-align:center;border-radius:50%;margin-right:6px;font-weight:700;color:#fff;background:#2f855a}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#bbb;margin-right:6px}.dot.on{background:#d64045;animation:p 1.2s infinite}@keyframes p{50%{opacity:.3}}
+.runs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.runs button{padding:18px;font-size:1.3rem;font-weight:800;border-radius:14px;border:1px solid var(--line);background:#fff;cursor:pointer}.runs button:hover{background:var(--g2)}
+.runs .w{background:#fdeaea}.runs .six{background:#fff3cf}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0}
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:12px;transition:.3s;z-index:20}#toast.show{transform:translateX(-50%)}#toast.err{background:#d64045}
+dialog{border:1px solid var(--line);border-radius:16px;padding:24px}[hidden]{display:none!important}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}}.pg{animation:fade .35s}
+@keyframes flow{50%{background-position:100% 50%}}.hero{background-size:200% 200%;animation:flow 9s ease infinite}
+.card{transition:.2s}.card.hov:hover{transform:translateY(-4px);box-shadow:0 10px 24px rgba(184,134,11,.28);cursor:pointer}
+tr.hov{cursor:pointer}tr.hov:hover{background:#fff8e6}
+.b{display:inline-block;padding:2px 10px;border-radius:99px;font-size:.72rem;font-weight:700}.b-Live{background:#fde2e2;color:#c0392b}.b-Completed{background:#e3f4e9;color:#2f855a}.b-Scheduled{background:#fff3cf;color:#8a6d00}.b-Abandoned{background:#eee;color:#777}.b-Tied{background:#e8eefc;color:#3b5bb5}
+.btn.d{border-color:#e7b4b4;color:#c0392b}.btn.s{padding:5px 10px;font-size:.8rem;margin:2px 0}
+.tick{overflow:hidden;white-space:nowrap;background:var(--ink);color:#f6e3a1;padding:7px 0;font-size:.9rem}.tick span{display:inline-block;padding-left:100%;animation:mq 30s linear infinite}@keyframes mq{to{transform:translateX(-100%)}}
+</style></head><body>
+<header><div class="brand">🏏 Pitch<b>Side</b></div>
+<nav id="nav"></nav><span id="who" class="lbl"></span><button class="btn p" id="lbtn">Login</button></header><div class="tick"><span id="tickt">Welcome to PitchSide</span></div>
+<main>
+<section id="dash" class="pg"><div class="hero"><h1>Tournament Command Centre</h1><p>MySQL · MongoDB · Redis · one live platform</p></div>
+<div class="grid" id="kpis"></div><div class="grid" id="livenow" style="margin-top:14px"></div><div class="row"><a class="btn" href="/api/export/standings.csv">⬇ Standings CSV</a><a class="btn" href="/api/export/matches.csv">⬇ Matches CSV</a></div><div class="grid" style="margin-top:14px;grid-template-columns:1fr 1fr">
+<div class="card"><h3>🏆 Points table</h3><table id="stand"></table></div><div class="card"><h3>🧢 Orange cap race</h3><canvas id="orange" height="200"></canvas></div></div>
+<div class="card" style="margin-top:14px"><h3>🎯 Shot mix across the tournament</h3><canvas id="mix" height="70"></canvas></div><div class="card" style="margin-top:14px"><h3>📅 Recent matches (click for scorecard)</h3><table id="recent"></table></div></section>
+
+<section id="live" class="pg" hidden><div class="hero"><h1><span class="dot" id="dot"></span>Live Match Centre</h1><p>Pushed to your screen the instant a ball is scored (WebSocket + Redis pub/sub)</p></div>
+<div class="row"><select id="lm" onchange="connect()"></select></div><div class="grid" id="lscore"></div>
+<div class="grid" style="margin-top:14px;grid-template-columns:2fr 1fr"><div class="card"><div class="lbl">Last 6 balls</div><div id="chips">—</div><p id="tgt"></p></div>
+<div class="card"><div class="lbl">Top scorers (Redis sorted set)</div><table id="ltop"></table></div></div></section>
+
+<section id="scorer" class="pg" hidden><div class="hero"><h1>🎯 Scorer Console</h1><p>Role protected. Each click goes to MongoDB, Redis and every open scoreboard</p></div>
+<p id="scmsg"></p><div class="card" id="scbox"><div class="row"><select id="sm" onchange="loadSquad()"></select>
+<select id="sinn" onchange="loadSquad()"><option value="1">Innings 1</option><option value="2">Innings 2</option></select>
+<select id="sst"></select><select id="sbw"></select>
+<select id="swt"><option>bowled</option><option>caught</option><option>lbw</option><option>run out</option></select></div>
+<div class="runs" id="runs"></div><div class="row"><button class="btn d" onclick="undo()">↩ Undo last ball</button><span class="lbl">Keys: 0 1 2 3 4 6 · W wicket · D wide</span></div><div id="sline" class="card" style="margin-top:10px"></div></div></section>
+
+<section id="matches" class="pg" hidden><div class="hero"><h1>📅 Match Control</h1><p>Fixtures, toss, scoring, corrections and results. Every action is audited</p></div>
+<div class="card" id="newm"><div class="row"><select id="t1"></select><select id="t2"></select><input id="ov" type="number" value="5" min="1" max="20" style="width:80px" title="Overs"><input id="md" type="date"><select id="stg"><option>League</option><option>Quarter-final</option><option>Semi-final</option><option>Final</option></select><button class="btn p" onclick="createMatch()">+ Add fixture</button></div></div>
+<div class="row"><select id="mf" onchange="loadMatches()"><option value="">All matches</option><option>Scheduled</option><option>Live</option><option>Completed</option><option>Abandoned</option><option>Tied</option></select></div>
+<div class="card"><table id="mtab"></table></div></section>
+<section id="teams" class="pg" hidden><div class="hero"><h1>🛡 Teams & Squads</h1><p>Register colleges, build squads and keep every record clean</p></div>
+<div class="card" id="tadm"><div class="row"><input id="tn" placeholder="Team name"><input id="tc" placeholder="Code" maxlength="3" style="width:90px"><input id="tcol" value="Manipal University Jaipur"><button class="btn p" onclick="addTeam()">+ Add team</button></div>
+<div class="row"><select id="ptm"></select><input id="pn" placeholder="Player name"><select id="pr"><option>Batter</option><option>Bowler</option><option>All-rounder</option><option>Wicketkeeper</option></select><input id="pj" type="number" placeholder="Jersey" style="width:90px"><button class="btn p" onclick="addPlayer()">+ Add player</button></div></div>
+<div class="grid" id="tgrid" style="margin-top:14px"></div></section>
+<section id="users" class="pg" hidden><div class="hero"><h1>🔐 User Accounts</h1><p>Admin creates scorer accounts. Passwords are stored hashed (bcrypt)</p></div>
+<div class="card" id="uadm"><div class="row"><input id="un" placeholder="Username"><input id="up" type="password" placeholder="Password (min 6)"><select id="ur"><option value="scorer">Scorer</option><option value="admin">Admin</option></select><button class="btn p" onclick="addUser()">+ Create account</button></div></div>
+<div class="card" style="margin-top:14px"><table id="utab"></table></div></section>
+<section id="analytics" class="pg" hidden><div class="hero"><h1>📊 Analytics</h1><p>MongoDB aggregation pipelines over ball-by-ball documents</p></div>
+<div class="row"><select id="am" onchange="loadAn()"></select></div><div id="resbox" style="margin-bottom:14px"></div><div class="grid" style="grid-template-columns:1fr 1fr">
+<div class="card"><canvas id="c1" height="200"></canvas></div><div class="card"><canvas id="c2" height="200"></canvas></div></div>
+<div class="grid" style="margin-top:14px;grid-template-columns:1fr 1fr"><div class="card"><h3>Batting</h3><table id="bat"></table></div><div class="card"><h3>Bowling</h3><table id="bow"></table></div></div></section>
+
+<section id="players" class="pg" hidden><div class="hero"><h1>👥 Player Hub</h1><p>Career stats across every match (MySQL profile + MongoDB performance)</p></div>
+<div class="row"><input id="ps" placeholder="Search player or team" oninput="drawPlayers()"></div><div class="card"><table id="ptab"></table></div></section>
+
+<section id="system" class="pg" hidden><div class="hero"><h1>🛠 System Health</h1><p>Live database latency, index proof and admin audit trail</p></div>
+<div class="grid" id="hl"></div><div class="card" style="margin-top:14px"><h3>MySQL index proof (EXPLAIN)</h3><table id="exp"></table></div>
+<div class="card" style="margin-top:14px"><h3>Audit log (admin only, stored in MongoDB)</h3><table id="aud"></table></div></section>
+</main>
+<dialog id="lg"><h3>Login</h3><div class="row"><input id="u" placeholder="Username"><input id="pw" type="password" placeholder="Password"></div>
+<div class="row"><button class="btn p" onclick="doLogin()">Login</button><button class="btn" onclick="lg.close()">Cancel</button></div></dialog>
+<dialog id="mdl"><div id="mbody"></div><div class="row"><button class="btn p" id="mok">OK</button><button class="btn" onclick="mdl.close()">Cancel</button></div></dialog>
+<div id="toast"></div>
+<script>
+const $=s=>document.querySelector(s);let T=localStorage.t,ROLE=localStorage.r,WS,CH={},PL=[],PICK=null,MS=[];
+const toast=(m,e)=>{const t=$('#toast');t.textContent=m;t.className='show'+(e?' err':'');setTimeout(()=>t.className='',2600)};
+async function api(p,o={}){const h={'Content-Type':'application/json'};if(T)h.Authorization='Bearer '+T;
+ const r=await fetch('/api'+p,{method:o.method||'GET',headers:h,body:o.body?JSON.stringify(o.body):undefined});const j=await r.json().catch(()=>({}));
+ if(!r.ok){toast(j.detail||'Something went wrong',1);throw j}return j}
+const chart=(id,cfg)=>{if(CH[id])CH[id].destroy();CH[id]=new Chart($('#'+id),cfg)};
+const GOLD=['#b8860b','#3b2f0b','#e8c963','#9a9484'],opt=async(sel,list,f)=>{$(sel).innerHTML=list.map(f).join('')};
+const mopt=m=>`<option value="${m.match_id}">#${m.match_id} ${m.team1} vs ${m.team2} (${m.status})</option>`;
+const PAGES={dash:['Dashboard',loadDash],live:['Live',loadLive],scorer:['Scorer',loadScorer],matches:['Matches',loadMatches],teams:['Teams',loadTeams],users:['Users',loadUsers],analytics:['Analytics',loadAn0],players:['Players',loadPlayers],system:['System',loadSystem]};
+$('#nav').innerHTML=Object.entries(PAGES).map(([k,v])=>`<button data-p="${k}" onclick="show('${k}')">${v[0]}</button>`).join('');
+function show(p){document.querySelectorAll('.pg').forEach(e=>e.hidden=e.id!=p);document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.p==p));PAGES[p][1]()}
+function authUI(){$('#who').textContent=T?`${ROLE} ✔`:'';$('#lbtn').textContent=T?'Logout':'Login'}
+$('#lbtn').onclick=()=>{if(T){T=ROLE=null;localStorage.clear();authUI();toast('Logged out')}else $('#lg').showModal()};
+async function doLogin(){const r=await api('/login',{method:'POST',body:{username:$('#u').value,password:$('#pw').value}});T=r.token;ROLE=r.role;localStorage.t=T;localStorage.r=ROLE;$('#lg').close();authUI();toast('Welcome, '+r.user)}
+// dashboard
+function countUp(el,to){let n=0;const st=Math.max(1,Math.ceil(to/25)),t=setInterval(()=>{n=Math.min(to,n+st);el.textContent=n;if(n>=to)clearInterval(t)},25)}
+const goLive=id=>{PICK=id;show('live')},openMatch=id=>{PICK=id;show('analytics')};
+async function loadDash(){const d=await api('/dashboard');
+ $('#kpis').innerHTML=Object.entries({Matches:d.kpi.matches,Players:d.kpi.players,'Balls recorded':d.kpi.balls,'Sixes hit':d.kpi.sixes}).map(([k,v])=>`<div class="card"><div class="lbl">${k}</div><div class="kpi" data-n="${v}">0</div></div>`).join('');
+ document.querySelectorAll('#kpis .kpi').forEach(e=>countUp(e,+e.dataset.n));
+ $('#livenow').innerHTML=d.live.length?d.live.map(s=>`<div class="card hov" onclick="goLive(${s.match.match_id})"><span class="b b-Live">● LIVE</span> &nbsp;<b>${s.match.team1}</b> ${s.inn1.runs}/${s.inn1.wickets} <span class="lbl">vs</span> <b>${s.match.team2}</b> ${s.inn2.runs}/${s.inn2.wickets}</div>`).join(''):'<div class="card lbl">No live match right now</div>';
+ const lead=d.standings[0];$('#tickt').textContent='🏏 '+(d.live.map(s=>`LIVE: ${s.match.team1} ${s.inn1.runs}/${s.inn1.wickets} vs ${s.match.team2} ${s.inn2.runs}/${s.inn2.wickets}`).join('   ·   ')||'No live match')+(lead?`   ·   🏆 Leader: ${lead.team_name} (${lead.points} pts)`:'');
+ $('#stand').innerHTML='<tr><th>Team<th>P<th>W<th>L<th>T<th>Pts<th>Win%</tr>'+d.standings.map(r=>`<tr><td>${r.team_name}<td>${r.played}<td>${r.won}<td>${r.lost}<td>${r.tied||0}<td><b>${r.points}</b><td>${r.win_percent}%`).join('');
+ chart('orange',{type:'bar',data:{labels:d.orange.map(x=>x.name),datasets:[{data:d.orange.map(x=>x.runs),backgroundColor:'#b8860b'}]},options:{indexAxis:'y',plugins:{legend:{display:false}}}});
+ chart('mix',{type:'bar',data:{labels:Object.keys(d.mix),datasets:[{data:Object.values(d.mix),backgroundColor:['#9a9484','#e8c963','#d4a82a','#b8860b','#8a6d00','#3b2f0b','#c0392b','#d98e04']}]},options:{plugins:{legend:{display:false}}}});
+ $('#recent').innerHTML='<tr><th>#<th>Match<th>Stage<th>Overs<th>Status</tr>'+d.recent.map(m=>`<tr class="hov" onclick="openMatch(${m.match_id})"><td>${m.match_id}<td>${m.team1} vs ${m.team2}<td>${m.stage||''}<td>${m.overs}<td><span class="b b-${m.status}">${m.status}</span>`).join('')}
+setInterval(()=>{if(!$('#dash').hidden)loadDash()},15000);
+// live (WebSocket)
+async function loadLive(){const M=await api('/matches');opt('#lm',M,mopt);if(PICK){$('#lm').value=PICK;PICK=null}connect()}
+function connect(){const id=$('#lm').value;if(!id)return;if(WS)WS.close();
+ WS=new WebSocket(`${location.protocol=='https:'?'wss':'ws'}://${location.host}/ws/live/${id}`);
+ WS.onopen=()=>$('#dot').className='dot on';WS.onclose=()=>$('#dot').className='dot';WS.onmessage=e=>drawLive(JSON.parse(e.data))}
+const ov=b=>`${Math.floor(b/6)}.${b%6}`;
+function drawLive(s){const m=s.match,a=s.inn1,b=s.inn2;
+ $('#lscore').innerHTML=[[m.team1,a,1],[m.team2,b,2]].map(([n,x,i])=>`<div class="card"><div class="lbl">${n} · innings ${i}</div><div class="score">${x.runs}/${x.wickets}</div><div class="lbl">${ov(x.balls)} / ${m.overs} overs · run rate ${x.balls?(x.runs*6/x.balls).toFixed(2):'0.00'}</div></div>`).join('');
+ const col={W:'#c0392b','6':'#8a6d00','4':'#b8860b','0':'#9a9484',Wd:'#d98e04'};
+ $('#chips').innerHTML=[...s.recent].reverse().map(r=>`<span class="chip" style="background:${col[r[0]]||'#2f855a'}">${r[0]}</span>`).join('')||'—';
+ const need=a.runs+1-b.runs,left=m.overs*6-b.balls;
+ $('#tgt').textContent=(b.balls||b.runs)?(need>0&&left>0?`🎯 Target ${a.runs+1} · ${m.team2} need ${need} from ${left} balls (required rate ${(need*6/left).toFixed(2)})`:'🎯 Chase finished'):'';
+ $('#ltop').innerHTML='<tr><th>Batter<th>Runs</tr>'+s.top.map(t=>`<tr><td>${t.name}<td><b>${t.runs}</b>`).join('')}
+// scorer
+async function loadScorer(){if(!T){$('#scmsg').textContent='Please login as scorer or admin to use the console.';$('#scbox').hidden=true;return}
+ $('#scbox').hidden=false;const M=(await api('/matches')).filter(m=>m.status=='Live');$('#scmsg').textContent=M.length?'':'No live match. An admin can create one in Matches.';
+ opt('#sm',M,mopt);$('#runs').innerHTML=['0','1','2','3','4','6','W','Wd'].map(k=>`<button class="${k=='W'?'w':k=='6'?'six':''}" onclick="ball('${k}')">${k}</button>`).join('');await loadSquad();upd()}
+async function loadSquad(){const id=$('#sm').value;if(!id)return;const s=await api(`/matches/${id}/squads`),i=$('#sinn').value;
+ opt('#sst',i==1?s.team1:s.team2,p=>`<option value="${p.id}">${p.name}</option>`);opt('#sbw',i==1?s.team2:s.team1,p=>`<option value="${p.id}">${p.name}</option>`)}
+async function ball(k){const r=await api(`/matches/${$('#sm').value}/ball`,{method:'POST',body:{innings:+$('#sinn').value,striker:+$('#sst').value,bowler:+$('#sbw').value,kind:k,wicket_type:$('#swt').value}});toast(r.commentary);upd()}
+// matches
+function modal(html,ok){$('#mbody').innerHTML=html;$('#mok').onclick=async()=>{await ok();$('#mdl').close()};$('#mdl').showModal()}
+async function loadMatches(){const [M,Tm]=await Promise.all([api('/matches'),api('/teams')]);MS=M;const o=t=>`<option value="${t.team_id}">${t.team_name}</option>`;opt('#t1',Tm,o);opt('#t2',Tm,o);$('#t2').selectedIndex=1;$('#newm').hidden=ROLE!='admin';
+ const f=$('#mf').value,A=ROLE=='admin',bt=(t,fn,c='')=>`<button class="btn s ${c}" onclick="${fn}">${t}</button> `;
+ $('#mtab').innerHTML='<tr><th>#<th>Match<th>Stage<th>Date<th>Overs<th>Status<th>Actions</tr>'+M.filter(m=>!f||m.status==f).map(m=>{let a=bt('Scorecard',`openMatch(${m.match_id})`);
+  if(m.status=='Scheduled'&&ROLE)a+=bt('▶ Start',`startM(${m.match_id})`);
+  if(m.status=='Live'&&A)a+=bt(m.team1+' won',`fin(${m.match_id},${m.team1_id})`)+bt(m.team2+' won',`fin(${m.match_id},${m.team2_id})`)+bt('Tie',`tieM(${m.match_id})`);
+  if(A&&['Scheduled','Live'].includes(m.status))a+=bt('Abandon',`aband(${m.match_id})`);
+  if(A&&['Completed','Abandoned','Tied'].includes(m.status))a+=bt('Reopen',`reopen(${m.match_id})`);
+  if(A)a+=bt('Edit',`editM(${m.match_id})`)+bt('Delete',`delM(${m.match_id})`,'d');
+  return `<tr><td>${m.match_id}<td>${m.team1} vs ${m.team2}<td>${m.stage||''}<td>${(m.match_date||'').slice(0,10)}<td>${m.overs}<td><span class="b b-${m.status}">${m.status}</span><td>${a}`}).join('')}
+async function createMatch(){await api('/matches',{method:'POST',body:{team1:+$('#t1').value,team2:+$('#t2').value,overs:+$('#ov').value,date:$('#md').value||null,stage:$('#stg').value}});toast('Fixture added');loadMatches()}
+function startM(id){const m=MS.find(x=>x.match_id==id);modal(`<h3>Toss</h3><div class="row"><select id="tw"><option value="${m.team1_id}">${m.team1}</option><option value="${m.team2_id}">${m.team2}</option></select> won the toss and chose to <select id="td"><option>Bat</option><option>Bowl</option></select></div>`,async()=>{await api(`/matches/${id}/start`,{method:'POST',body:{toss_winner:+$('#tw').value,decision:$('#td').value}});toast('Match started. Batting order set from the toss');loadMatches()})}
+async function fin(id,w){if(!confirm('Confirm the winner? Points will update.'))return;await api(`/matches/${id}/complete/${w}`,{method:'POST'});toast('Completed. The trigger updated the points table');loadMatches()}
+async function aband(id){const r=prompt('Reason (for example rain)');if(r===null)return;await api(`/matches/${id}/abandon`,{method:'POST',body:{reason:r}});toast('Abandoned. 1 point each');loadMatches()}
+async function reopen(id){if(!confirm('Reopen this match to correct it? Points will be recalculated.'))return;await api(`/matches/${id}/reopen`,{method:'POST'});toast('Match reopened');loadMatches()}
+async function delM(id){if(!confirm('Delete this match and all its balls permanently?'))return;await api('/matches/'+id,{method:'DELETE'});toast('Match deleted. Points recalculated');loadMatches()}
+function editM(id){const m=MS.find(x=>x.match_id==id);modal(`<h3>Edit match #${id}</h3><div class="row"><label>Overs <input id="eo" type="number" value="${m.overs}" style="width:80px"></label><label>Date <input id="ed" type="date" value="${(m.match_date||'').slice(0,10)}"></label><select id="es">${['League','Quarter-final','Semi-final','Final'].map(s=>`<option ${s==m.stage?'selected':''}>${s}</option>`).join('')}</select></div>`,async()=>{await api('/matches/'+id,{method:'PUT',body:{overs:+$('#eo').value,date:$('#ed').value||null,stage:$('#es').value}});toast('Match updated');loadMatches()})}
+// teams
+async function loadTeams(){const [Tm,P]=await Promise.all([api('/teams'),api('/players')]);const A=ROLE=='admin';$('#tadm').hidden=!A;opt('#ptm',Tm,t=>`<option value="${t.team_id}">${t.team_name}</option>`);
+ $('#tgrid').innerHTML=Tm.map(t=>`<div class="card"><h3>${t.team_name} <span class="lbl">${t.short_code}</span></h3><div class="lbl">${t.college}</div><table>${P.filter(p=>p.team_id==t.team_id).map(p=>`<tr><td>#${p.jersey_no} ${p.full_name}<td class="lbl">${p.role}<td>${A?`<button class="btn s d" onclick="delP(${p.player_id})">✕</button>`:''}`).join('')}</table>${A?`<button class="btn s d" onclick="delT(${t.team_id})">Delete team</button>`:''}</div>`).join('')}
+async function addTeam(){await api('/teams',{method:'POST',body:{team_name:$('#tn').value,short_code:$('#tc').value.toUpperCase(),college:$('#tcol').value}});toast('Team added');loadTeams()}
+async function addPlayer(){await api('/players',{method:'POST',body:{team_id:+$('#ptm').value,full_name:$('#pn').value,role:$('#pr').value,jersey_no:+$('#pj').value}});toast('Player added');loadTeams()}
+async function delP(id){if(confirm('Remove this player?')){await api('/players/'+id,{method:'DELETE'});toast('Player removed');loadTeams()}}
+async function delT(id){if(confirm('Delete this team?')){await api('/teams/'+id,{method:'DELETE'});toast('Team deleted');loadTeams()}}
+// scorer extras
+async function upd(){const id=$('#sm').value;if(!id)return;const s=await api(`/matches/${id}/snapshot`),m=s.match;$('#sline').innerHTML=`<b>${m.team1}</b> ${s.inn1.runs}/${s.inn1.wickets} (${ov(s.inn1.balls)}) · <b>${m.team2}</b> ${s.inn2.runs}/${s.inn2.wickets} (${ov(s.inn2.balls)}) &nbsp; ${[...s.recent].reverse().map(r=>`<span class="chip">${r[0]}</span>`).join('')}`}
+async function undo(){const r=await api(`/matches/${$('#sm').value}/undo`,{method:'POST'});toast('Undone: '+r.undone);upd()}
+document.addEventListener('keydown',e=>{if(!$('#scorer').hidden&&!/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)){const k={'0':'0','1':'1','2':'2','3':'3','4':'4','6':'6',W:'W',D:'Wd'}[e.key.toUpperCase()];if(k)ball(k)}});
+// tie + users
+function tieM(id){const m=MS.find(x=>x.match_id==id);modal(`<h3>Match tied</h3><p>Was there a super over?</p><select id="so"><option value="">No super over (1 point each)</option><option value="${m.team1_id}">${m.team1} won the super over</option><option value="${m.team2_id}">${m.team2} won the super over</option></select>`,async()=>{await api(`/matches/${id}/tie`,{method:'POST',body:{super_over_winner:+$('#so').value||null}});toast('Tie recorded');loadMatches()})}
+async function loadUsers(){if(ROLE!='admin'){$('#uadm').hidden=true;$('#utab').innerHTML='<tr><td>Login as admin to manage accounts.</tr>';return}$('#uadm').hidden=false;const U=await api('/users');
+ $('#utab').innerHTML='<tr><th>ID<th>Username<th>Role<th></tr>'+U.map(x=>`<tr><td>${x.user_id}<td>${x.username}<td>${x.role}<td><button class="btn s" onclick="resetU(${x.user_id})">Reset password</button> <button class="btn s d" onclick="delU(${x.user_id})">Delete</button>`).join('')}
+async function addUser(){await api('/users',{method:'POST',body:{username:$('#un').value,password:$('#up').value,role:$('#ur').value}});toast('Account created');$('#un').value=$('#up').value='';loadUsers()}
+async function resetU(id){const p=prompt('New password (min 6 characters)');if(p){await api(`/users/${id}/reset`,{method:'POST',body:{password:p}});toast('Password reset')}}
+async function delU(id){if(confirm('Delete this account?')){await api('/users/'+id,{method:'DELETE'});toast('Account deleted');loadUsers()}}
+// analytics
+async function loadAn0(){const M=await api('/matches');opt('#am',M,mopt);if(PICK){$('#am').value=PICK;PICK=null}loadAn()}
+async function loadAn(){const id=$('#am').value;if(!id)return;const d=await api(`/matches/${id}/analytics`);const S=d.summary;$('#resbox').innerHTML=`<div class="card"><div class="lbl">${S.title} ${S.toss?'· '+S.toss:''}</div><div class="score" style="font-size:1.8rem">${S.result}</div><div>${S.totals[1]} vs ${S.totals[2]} runs ${S.potm?' · ⭐ Player of the match: <b>'+S.potm.name+'</b>':''}</div><a class="btn s" href="/api/matches/${id}/balls.csv">⬇ Ball-by-ball CSV</a></div>`;
+ const ds=(f)=>[1,2].map(i=>({label:'Innings '+i,data:f(d.per_over.filter(x=>x.inn==i)),backgroundColor:GOLD[i-1],borderColor:GOLD[i-1]}));
+ const labels=[...new Set(d.per_over.map(x=>x.over))];
+ chart('c1',{type:'bar',data:{labels,datasets:ds(a=>a.map(x=>x.runs))},options:{plugins:{title:{display:true,text:'Manhattan: runs per over'}}}});
+ chart('c2',{type:'line',data:{labels,datasets:ds(a=>{let t=0;return a.map(x=>t+=x.runs)})},options:{plugins:{title:{display:true,text:'Worm: cumulative runs'}}}});
+ $('#bat').innerHTML='<tr><th>Batter<th>R<th>B<th>4s<th>6s<th>SR</tr>'+d.batters.map(b=>`<tr><td>${b.name}<td><b>${b.runs}</b><td>${b.balls}<td>${b.fours}<td>${b.sixes}<td>${b.sr}`).join('');
+ $('#bow').innerHTML='<tr><th>Bowler<th>R<th>Balls<th>W<th>Eco</tr>'+d.bowlers.map(b=>`<tr><td>${b.name}<td>${b.runs}<td>${b.balls}<td><b>${b.wickets}</b><td>${b.eco}`).join('')}
+// players
+async function loadPlayers(){PL=await api('/players');drawPlayers()}
+function drawPlayers(){const f=$('#ps').value.toLowerCase();$('#ptab').innerHTML='<tr><th>Player<th>Team<th>Role<th>Runs<th>SR<th>6s<th>Wkts</tr>'+PL.filter(p=>(p.full_name+p.team_name).toLowerCase().includes(f)).map(p=>`<tr><td><b>${p.full_name}</b> #${p.jersey_no}<td>${p.team_name}<td>${p.role}<td>${p.runs}<td>${p.sr}<td>${p.sixes}<td>${p.wickets}`).join('')}
+// system
+async function loadSystem(){const h=await api('/health');
+ $('#hl').innerHTML=[['MySQL',h.mysql+' ms','Strict data, triggers, procedures'],['MongoDB',h.mongo+' ms',h.balls+' ball documents'],['Redis',h.redis+' ms',h.redis_keys+' live keys']].map(([a,b,c])=>`<div class="card"><div class="lbl">${a}</div><div class="kpi">${b}</div><div class="lbl">${c}</div></div>`).join('');
+ const e=h.explain;$('#exp').innerHTML='<tr><th>table<th>type<th>possible keys<th>key used<th>rows</tr>'+e.map(r=>`<tr><td>${r.table}<td>${r.type}<td>${r.possible_keys}<td><b>${r.key}</b><td>${r.rows}`).join('');
+ if(ROLE=='admin'){const a=await api('/audit');$('#aud').innerHTML='<tr><th>Time<th>User<th>Action<th>Details</tr>'+a.map(x=>`<tr><td>${x.ts}<td>${x.user}<td>${x.action}<td>${JSON.stringify(x.data)}`).join('')}else $('#aud').innerHTML='<tr><td>Login as admin to see the audit trail.</tr>'}
+authUI();show('dash');
+</script></body></html>
