@@ -1,5 +1,7 @@
 # 🏏 PitchSide: Live Cricket Tournament Platform
 
+🔗 **Live showcase (try the simulator):** https://ayushi77-verma.github.io/pitchside/
+
 A real-time scoring and analytics platform for inter-college cricket tournaments, built for the RDBMS course (Fast Learner project).
 Three databases, each doing the job it is best at.
 
@@ -29,7 +31,7 @@ admin-created scorer accounts, audit trail, CSV export, system health with EXPLA
 3. Copy `.env.example` to `.env` and fill in your values.
 4. In MySQL: `CREATE DATABASE pitchside;` then run `database/schema.sql` and `database/advanced.sql`.
 5. Start: `uvicorn main:app --reload` and open **http://localhost:8000** (API docs: `/docs`).
-6. Optional demo data: create a match, then `python seed_balls.py 1`.
+6. Demo data: start the server once, then run `python seed_tournament.py` and type YES. It creates 6 teams, 66 players, 10 results, one live match and upcoming fixtures.
 
 Default logins (change them): `admin / admin@123`, `scorer / scorer@123`.
 
@@ -37,6 +39,7 @@ Default logins (change them): `admin / admin@123`, `scorer / scorer@123`.
 ```
 main.py          FastAPI backend (REST + WebSocket)
 index.html       Frontend
-seed_balls.py    Demo data generator
+seed_tournament.py  Demo tournament generator
+docs/            GitHub Pages showcase site
 database/        SQL scripts
 ```

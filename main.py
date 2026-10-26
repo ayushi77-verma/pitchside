@@ -140,9 +140,12 @@ def dashboard():
                               {"$sort": {"runs": -1}}, {"$limit": 6}])
     d = {"kpi": {"matches": q("SELECT COUNT(*) n FROM matches")[0]["n"], "players": q("SELECT COUNT(*) n FROM players")[0]["n"],
                  "balls": balls.count_documents({}), "sixes": balls.count_documents({"runs": 6, "extra_type": None})},
-         "standings": q("SELECT * FROM v_points_standings"),
+         "standings": standings(),
          "orange": [{"name": x["_id"], "runs": x["runs"]} for x in orange], "recent": matches()[:6]}
     d["live"] = [snapshot(x["match_id"]) for x in d["recent"] if x["status"] == "Live"]
+    d["results"] = [x for x in reversed(match_results()) if x["status"] in ("Completed", "Tied", "Abandoned")][:5]
+    d["purple"] = [{"name": x["_id"], "wickets": x["w"]} for x in balls.aggregate([{"$match": {"is_wicket": True}},
+                   {"$group": {"_id": "$bowler_name", "w": {"$sum": 1}}}, {"$sort": {"w": -1}}, {"$limit": 6}])]
     mix = {}
     for x in balls.aggregate([{"$group": {"_id": {"r": "$runs", "w": "$is_wicket", "x": "$extra_type"}, "n": {"$sum": 1}}}]):
         i = x["_id"]; k = "Wicket" if i["w"] else "Wide" if i["x"] else ("Dot" if i["r"] == 0 else str(i["r"]))
@@ -469,3 +472,55 @@ def export_balls(mid: int):
     for r in rows: r["ts"] = str(r.get("ts", ""))
     return csv_resp(rows, f"match_{mid}_balls.csv", ["match_id", "innings", "over", "ball", "batter_name", "bowler_name", "runs",
                                                      "extra_type", "is_wicket", "wicket_type", "commentary", "ts"])
+
+
+# ================= v5: realistic tournament table (net run rate, form) and results =================
+def _res_text(m, a1, a2, sq2):
+    if m["status"] == "Scheduled": return "Yet to start"
+    if m["status"] == "Live": return "In progress"
+    if m["status"] == "Abandoned": return "Match abandoned"
+    if m["status"] == "Tied": return "Match tied"
+    if m["result_note"] and "super over" in m["result_note"]:
+        return f"Scores tied. {m['team1'] if m['winner_team_id'] == m['team1_id'] else m['team2']} won the super over"
+    if m["winner_team_id"] == m["team1_id"]: return f"{m['team1']} won by {a1['runs'] - a2['runs']} runs"
+    return f"{m['team2']} won by {max(sq2 - 1 - a2['wk'], 0)} wickets"
+
+def match_results():
+    ms = q("""SELECT m.match_id,m.team1_id,m.team2_id,m.overs,m.status,m.winner_team_id,m.stage,m.match_date,m.result_note,
+              t1.team_name team1,t2.team_name team2,t1.short_code c1,t2.short_code c2 FROM matches m
+              JOIN teams t1 ON t1.team_id=m.team1_id JOIN teams t2 ON t2.team_id=m.team2_id ORDER BY m.match_id""")
+    agg = {(x["_id"]["m"], x["_id"]["i"]): {"runs": x["runs"], "wk": x["wk"], "legal": x["legal"]} for x in balls.aggregate([
+        {"$group": {"_id": {"m": "$match_id", "i": "$innings"}, "runs": {"$sum": "$runs"}, "wk": {"$sum": {"$cond": ["$is_wicket", 1, 0]}},
+                    "legal": {"$sum": {"$cond": [{"$eq": ["$extra_type", None]}, 1, 0]}}}}])}
+    sq = {r["team_id"]: r["n"] for r in q("SELECT team_id, COUNT(*) n FROM players GROUP BY team_id")}
+    z = {"runs": 0, "wk": 0, "legal": 0}
+    for m in ms:
+        m["s1"], m["s2"] = agg.get((m["match_id"], 1), z), agg.get((m["match_id"], 2), z)
+        m["sq"] = (sq.get(m["team1_id"], 11), sq.get(m["team2_id"], 11))
+        m["result"] = _res_text(m, m["s1"], m["s2"], m["sq"][1])
+    return ms
+
+def standings():
+    ms = match_results()
+    T = {r["team_id"]: {**r, "rf": 0, "bf": 0, "ra": 0, "bb": 0, "form": []} for r in q(
+        "SELECT t.team_id,t.team_name,t.short_code,p.played,p.won,p.lost,p.tied,p.points FROM points_table p JOIN teams t USING(team_id)")}
+    faced = lambda a, sqd, ov: ov * 6 if a["wk"] >= sqd - 1 else a["legal"]     # all out counts as the full quota of overs
+    for m in ms:
+        if m["status"] not in ("Completed", "Tied"): continue
+        f1, f2 = faced(m["s1"], m["sq"][0], m["overs"]), faced(m["s2"], m["sq"][1], m["overs"])
+        for tid, rf, bf, ra, bb in ((m["team1_id"], m["s1"]["runs"], f1, m["s2"]["runs"], f2), (m["team2_id"], m["s2"]["runs"], f2, m["s1"]["runs"], f1)):
+            if tid in T:
+                t = T[tid]; t["rf"] += rf; t["bf"] += bf; t["ra"] += ra; t["bb"] += bb
+                t["form"].append("T" if m["status"] == "Tied" else "W" if m["winner_team_id"] == tid else "L")
+    for t in T.values():
+        t["nrr"] = round(t["rf"] * 6 / t["bf"] - t["ra"] * 6 / t["bb"], 3) if t["bf"] and t["bb"] else 0.0
+        t["form"] = t["form"][-5:]
+    return sorted(T.values(), key=lambda t: (-t["points"], -t["nrr"]))
+
+@app.get("/api/standings")
+def api_standings():
+    return standings()
+
+@app.get("/api/results")
+def api_results():
+    return [x for x in reversed(match_results()) if x["status"] in ("Completed", "Tied", "Abandoned")]

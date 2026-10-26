@@ -8,8 +8,8 @@ header{position:sticky;top:0;z-index:9;display:flex;gap:14px;align-items:center;
 .brand{font-weight:800;font-size:1.3rem}.brand b{color:var(--g)}nav{display:flex;gap:4px;flex:1;flex-wrap:wrap}
 nav button,.btn{border:1px solid var(--line);background:#fff;color:var(--ink);padding:8px 14px;border-radius:10px;cursor:pointer;font-weight:600}
 nav button.on,.btn.p{background:linear-gradient(120deg,#c9a227,#e8c963);border-color:#c9a227}nav button:hover,.btn:hover{border-color:var(--g)}
-main{max-width:1180px;margin:auto;padding:22px}.hero{padding:26px 30px;border-radius:20px;margin-bottom:18px;background:linear-gradient(120deg,#c9a227,#e8c963 55%,#f6e3a1);box-shadow:0 6px 18px rgba(184,134,11,.25)}
-.hero h1{margin:0;font-size:2rem}.hero p{margin:4px 0 0;color:#5a4a15}.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+main{max-width:1180px;margin:auto;padding:22px}.hero{padding:12px 24px;border-radius:14px;margin-bottom:14px;background:linear-gradient(120deg,#c9a227,#e8c963 55%,#f6e3a1);box-shadow:0 6px 18px rgba(184,134,11,.25)}
+.hero h1{margin:0;font-size:1.45rem}.hero p{margin:4px 0 0;color:#5a4a15}.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
 .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 20px;box-shadow:0 2px 10px rgba(184,134,11,.12)}
 .lbl{color:var(--mut);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase}.kpi{font-size:2rem;font-weight:800}.score{font-size:3rem;font-weight:800;line-height:1.1}
 table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}th{color:var(--mut);font-size:.75rem;text-transform:uppercase}
@@ -24,50 +24,50 @@ dialog{border:1px solid var(--line);border-radius:16px;padding:24px}[hidden]{dis
 @keyframes flow{50%{background-position:100% 50%}}.hero{background-size:200% 200%;animation:flow 9s ease infinite}
 .card{transition:.2s}.card.hov:hover{transform:translateY(-4px);box-shadow:0 10px 24px rgba(184,134,11,.28);cursor:pointer}
 tr.hov{cursor:pointer}tr.hov:hover{background:#fff8e6}
-.b{display:inline-block;padding:2px 10px;border-radius:99px;font-size:.72rem;font-weight:700}.b-Live{background:#fde2e2;color:#c0392b}.b-Completed{background:#e3f4e9;color:#2f855a}.b-Scheduled{background:#fff3cf;color:#8a6d00}.b-Abandoned{background:#eee;color:#777}.b-Tied{background:#e8eefc;color:#3b5bb5}
+.b{display:inline-block;padding:2px 10px;border-radius:99px;font-size:.72rem;font-weight:700}.b-Live{background:#fde2e2;color:#c0392b}.b-Completed{background:#e3f4e9;color:#2f855a}.b-Scheduled{background:#fff3cf;color:#8a6d00}.b-Abandoned{background:#eee;color:#777}.bdg{display:inline-block;min-width:38px;padding:3px 6px;border-radius:8px;color:#fff;font-weight:700;font-size:.74rem;text-align:center}.fm{display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;border-radius:50%;color:#fff;font-size:.68rem;font-weight:700;margin-right:3px}.rs{padding:10px 4px;border-bottom:1px solid var(--line)}.b-Tied{background:#e8eefc;color:#3b5bb5}
 .btn.d{border-color:#e7b4b4;color:#c0392b}.btn.s{padding:5px 10px;font-size:.8rem;margin:2px 0}
 .tick{overflow:hidden;white-space:nowrap;background:var(--ink);color:#f6e3a1;padding:7px 0;font-size:.9rem}.tick span{display:inline-block;padding-left:100%;animation:mq 30s linear infinite}@keyframes mq{to{transform:translateX(-100%)}}
 </style></head><body>
 <header><div class="brand">🏏 Pitch<b>Side</b></div>
 <nav id="nav"></nav><span id="who" class="lbl"></span><button class="btn p" id="lbtn">Login</button></header><div class="tick"><span id="tickt">Welcome to PitchSide</span></div>
 <main>
-<section id="dash" class="pg"><div class="hero"><h1>Tournament Command Centre</h1><p>MySQL · MongoDB · Redis · one live platform</p></div>
+<section id="dash" class="pg"><div class="hero"><h1>Tournament Command Centre</h1></div>
 <div class="grid" id="kpis"></div><div class="grid" id="livenow" style="margin-top:14px"></div><div class="row"><a class="btn" href="/api/export/standings.csv">⬇ Standings CSV</a><a class="btn" href="/api/export/matches.csv">⬇ Matches CSV</a></div><div class="grid" style="margin-top:14px;grid-template-columns:1fr 1fr">
 <div class="card"><h3>🏆 Points table</h3><table id="stand"></table></div><div class="card"><h3>🧢 Orange cap race</h3><canvas id="orange" height="200"></canvas></div></div>
-<div class="card" style="margin-top:14px"><h3>🎯 Shot mix across the tournament</h3><canvas id="mix" height="70"></canvas></div><div class="card" style="margin-top:14px"><h3>📅 Recent matches (click for scorecard)</h3><table id="recent"></table></div></section>
+<div class="grid" style="margin-top:14px;grid-template-columns:1fr 1fr"><div class="card"><h3>📋 Recent results (click for scorecard)</h3><div id="results"></div></div><div class="card"><h3>🟣 Purple cap race</h3><canvas id="purple" height="200"></canvas></div></div><div class="card" style="margin-top:14px"><h3>🎯 Shot mix across the tournament</h3><canvas id="mix" height="70"></canvas></div><div class="card" style="margin-top:14px"><h3>📅 Recent matches (click for scorecard)</h3><table id="recent"></table></div></section>
 
-<section id="live" class="pg" hidden><div class="hero"><h1><span class="dot" id="dot"></span>Live Match Centre</h1><p>Pushed to your screen the instant a ball is scored (WebSocket + Redis pub/sub)</p></div>
+<section id="live" class="pg" hidden><div class="hero"><h1><span class="dot" id="dot"></span>Live Match Centre</h1></div>
 <div class="row"><select id="lm" onchange="connect()"></select></div><div class="grid" id="lscore"></div>
 <div class="grid" style="margin-top:14px;grid-template-columns:2fr 1fr"><div class="card"><div class="lbl">Last 6 balls</div><div id="chips">—</div><p id="tgt"></p></div>
 <div class="card"><div class="lbl">Top scorers (Redis sorted set)</div><table id="ltop"></table></div></div></section>
 
-<section id="scorer" class="pg" hidden><div class="hero"><h1>🎯 Scorer Console</h1><p>Role protected. Each click goes to MongoDB, Redis and every open scoreboard</p></div>
+<section id="scorer" class="pg" hidden><div class="hero"><h1>🎯 Scorer Console</h1></div>
 <p id="scmsg"></p><div class="card" id="scbox"><div class="row"><select id="sm" onchange="loadSquad()"></select>
 <select id="sinn" onchange="loadSquad()"><option value="1">Innings 1</option><option value="2">Innings 2</option></select>
 <select id="sst"></select><select id="sbw"></select>
 <select id="swt"><option>bowled</option><option>caught</option><option>lbw</option><option>run out</option></select></div>
 <div class="runs" id="runs"></div><div class="row"><button class="btn d" onclick="undo()">↩ Undo last ball</button><span class="lbl">Keys: 0 1 2 3 4 6 · W wicket · D wide</span></div><div id="sline" class="card" style="margin-top:10px"></div></div></section>
 
-<section id="matches" class="pg" hidden><div class="hero"><h1>📅 Match Control</h1><p>Fixtures, toss, scoring, corrections and results. Every action is audited</p></div>
+<section id="matches" class="pg" hidden><div class="hero"><h1>📅 Match Control</h1></div>
 <div class="card" id="newm"><div class="row"><select id="t1"></select><select id="t2"></select><input id="ov" type="number" value="5" min="1" max="20" style="width:80px" title="Overs"><input id="md" type="date"><select id="stg"><option>League</option><option>Quarter-final</option><option>Semi-final</option><option>Final</option></select><button class="btn p" onclick="createMatch()">+ Add fixture</button></div></div>
 <div class="row"><select id="mf" onchange="loadMatches()"><option value="">All matches</option><option>Scheduled</option><option>Live</option><option>Completed</option><option>Abandoned</option><option>Tied</option></select></div>
 <div class="card"><table id="mtab"></table></div></section>
-<section id="teams" class="pg" hidden><div class="hero"><h1>🛡 Teams & Squads</h1><p>Register colleges, build squads and keep every record clean</p></div>
+<section id="teams" class="pg" hidden><div class="hero"><h1>🛡 Teams & Squads</h1></div>
 <div class="card" id="tadm"><div class="row"><input id="tn" placeholder="Team name"><input id="tc" placeholder="Code" maxlength="3" style="width:90px"><input id="tcol" value="Manipal University Jaipur"><button class="btn p" onclick="addTeam()">+ Add team</button></div>
 <div class="row"><select id="ptm"></select><input id="pn" placeholder="Player name"><select id="pr"><option>Batter</option><option>Bowler</option><option>All-rounder</option><option>Wicketkeeper</option></select><input id="pj" type="number" placeholder="Jersey" style="width:90px"><button class="btn p" onclick="addPlayer()">+ Add player</button></div></div>
 <div class="grid" id="tgrid" style="margin-top:14px"></div></section>
-<section id="users" class="pg" hidden><div class="hero"><h1>🔐 User Accounts</h1><p>Admin creates scorer accounts. Passwords are stored hashed (bcrypt)</p></div>
+<section id="users" class="pg" hidden><div class="hero"><h1>🔐 User Accounts</h1></div>
 <div class="card" id="uadm"><div class="row"><input id="un" placeholder="Username"><input id="up" type="password" placeholder="Password (min 6)"><select id="ur"><option value="scorer">Scorer</option><option value="admin">Admin</option></select><button class="btn p" onclick="addUser()">+ Create account</button></div></div>
 <div class="card" style="margin-top:14px"><table id="utab"></table></div></section>
-<section id="analytics" class="pg" hidden><div class="hero"><h1>📊 Analytics</h1><p>MongoDB aggregation pipelines over ball-by-ball documents</p></div>
+<section id="analytics" class="pg" hidden><div class="hero"><h1>📊 Analytics</h1></div>
 <div class="row"><select id="am" onchange="loadAn()"></select></div><div id="resbox" style="margin-bottom:14px"></div><div class="grid" style="grid-template-columns:1fr 1fr">
 <div class="card"><canvas id="c1" height="200"></canvas></div><div class="card"><canvas id="c2" height="200"></canvas></div></div>
 <div class="grid" style="margin-top:14px;grid-template-columns:1fr 1fr"><div class="card"><h3>Batting</h3><table id="bat"></table></div><div class="card"><h3>Bowling</h3><table id="bow"></table></div></div></section>
 
-<section id="players" class="pg" hidden><div class="hero"><h1>👥 Player Hub</h1><p>Career stats across every match (MySQL profile + MongoDB performance)</p></div>
+<section id="players" class="pg" hidden><div class="hero"><h1>👥 Player Hub</h1></div>
 <div class="row"><input id="ps" placeholder="Search player or team" oninput="drawPlayers()"></div><div class="card"><table id="ptab"></table></div></section>
 
-<section id="system" class="pg" hidden><div class="hero"><h1>🛠 System Health</h1><p>Live database latency, index proof and admin audit trail</p></div>
+<section id="system" class="pg" hidden><div class="hero"><h1>🛠 System Health</h1></div>
 <div class="grid" id="hl"></div><div class="card" style="margin-top:14px"><h3>MySQL index proof (EXPLAIN)</h3><table id="exp"></table></div>
 <div class="card" style="margin-top:14px"><h3>Audit log (admin only, stored in MongoDB)</h3><table id="aud"></table></div></section>
 </main>
@@ -91,6 +91,7 @@ function authUI(){$('#who').textContent=T?`${ROLE} ✔`:'';$('#lbtn').textConten
 $('#lbtn').onclick=()=>{if(T){T=ROLE=null;localStorage.clear();authUI();toast('Logged out')}else $('#lg').showModal()};
 async function doLogin(){const r=await api('/login',{method:'POST',body:{username:$('#u').value,password:$('#pw').value}});T=r.token;ROLE=r.role;localStorage.t=T;localStorage.r=ROLE;$('#lg').close();authUI();toast('Welcome, '+r.user)}
 // dashboard
+const hue=s=>{let n=0;for(const c of s)n=(n*31+c.charCodeAt(0))%360;return n},badge=c=>`<span class="bdg" style="background:hsl(${hue(c)},55%,40%)">${c}</span>`;
 function countUp(el,to){let n=0;const st=Math.max(1,Math.ceil(to/25)),t=setInterval(()=>{n=Math.min(to,n+st);el.textContent=n;if(n>=to)clearInterval(t)},25)}
 const goLive=id=>{PICK=id;show('live')},openMatch=id=>{PICK=id;show('analytics')};
 async function loadDash(){const d=await api('/dashboard');
@@ -98,7 +99,9 @@ async function loadDash(){const d=await api('/dashboard');
  document.querySelectorAll('#kpis .kpi').forEach(e=>countUp(e,+e.dataset.n));
  $('#livenow').innerHTML=d.live.length?d.live.map(s=>`<div class="card hov" onclick="goLive(${s.match.match_id})"><span class="b b-Live">● LIVE</span> &nbsp;<b>${s.match.team1}</b> ${s.inn1.runs}/${s.inn1.wickets} <span class="lbl">vs</span> <b>${s.match.team2}</b> ${s.inn2.runs}/${s.inn2.wickets}</div>`).join(''):'<div class="card lbl">No live match right now</div>';
  const lead=d.standings[0];$('#tickt').textContent='🏏 '+(d.live.map(s=>`LIVE: ${s.match.team1} ${s.inn1.runs}/${s.inn1.wickets} vs ${s.match.team2} ${s.inn2.runs}/${s.inn2.wickets}`).join('   ·   ')||'No live match')+(lead?`   ·   🏆 Leader: ${lead.team_name} (${lead.points} pts)`:'');
- $('#stand').innerHTML='<tr><th>Team<th>P<th>W<th>L<th>T<th>Pts<th>Win%</tr>'+d.standings.map(r=>`<tr><td>${r.team_name}<td>${r.played}<td>${r.won}<td>${r.lost}<td>${r.tied||0}<td><b>${r.points}</b><td>${r.win_percent}%`).join('');
+ $('#stand').innerHTML='<tr><th>#<th>Team<th>P<th>W<th>L<th>T<th>NRR<th>Pts<th>Form</tr>'+d.standings.map((r,i)=>`<tr><td>${i+1}<td>${badge(r.short_code)} ${r.team_name}<td>${r.played}<td>${r.won}<td>${r.lost}<td>${r.tied||0}<td>${r.nrr>0?'+':''}${r.nrr}<td><b>${r.points}</b><td>${r.form.map(f=>`<span class="fm" style="background:${f=='W'?'#2f855a':f=='L'?'#c0392b':'#9a9484'}">${f}</span>`).join('')}`).join('');
+ $('#results').innerHTML=d.results.length?d.results.map(m=>`<div class="rs hov" onclick="openMatch(${m.match_id})"><div>${badge(m.c1)} <b>${m.s1.runs}/${m.s1.wk}</b> &nbsp;v&nbsp; ${badge(m.c2)} <b>${m.s2.runs}/${m.s2.wk}</b> <span class="lbl">${m.stage||''}</span></div><div class="lbl">${m.result}</div></div>`).join(''):'<span class="lbl">No results yet</span>';
+ chart('purple',{type:'bar',data:{labels:d.purple.map(x=>x.name),datasets:[{data:d.purple.map(x=>x.wickets),backgroundColor:'#6b4c9a'}]},options:{indexAxis:'y',plugins:{legend:{display:false}}}});
  chart('orange',{type:'bar',data:{labels:d.orange.map(x=>x.name),datasets:[{data:d.orange.map(x=>x.runs),backgroundColor:'#b8860b'}]},options:{indexAxis:'y',plugins:{legend:{display:false}}}});
  chart('mix',{type:'bar',data:{labels:Object.keys(d.mix),datasets:[{data:Object.values(d.mix),backgroundColor:['#9a9484','#e8c963','#d4a82a','#b8860b','#8a6d00','#3b2f0b','#c0392b','#d98e04']}]},options:{plugins:{legend:{display:false}}}});
  $('#recent').innerHTML='<tr><th>#<th>Match<th>Stage<th>Overs<th>Status</tr>'+d.recent.map(m=>`<tr class="hov" onclick="openMatch(${m.match_id})"><td>${m.match_id}<td>${m.team1} vs ${m.team2}<td>${m.stage||''}<td>${m.overs}<td><span class="b b-${m.status}">${m.status}</span>`).join('')}

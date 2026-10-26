@@ -1,0 +1,58 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PitchSide · Every ball. Every database.</title><meta name="description" content="A live cricket tournament platform built on MySQL, MongoDB and Redis.">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{--g:#e8c963;--g2:#b8860b;--bg:#0c0a03;--ink:#f7f0d8;--mut:#a79a6a}*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Georgia,'Times New Roman',serif;line-height:1.6}
+nav{position:sticky;top:0;z-index:5;display:flex;gap:22px;align-items:center;padding:14px 5vw;background:rgba(12,10,3,.9);backdrop-filter:blur(8px);border-bottom:1px solid #2a2410;font-family:system-ui,sans-serif;font-size:.9rem}
+nav b{color:var(--g);font-size:1.1rem;margin-right:auto;letter-spacing:.04em}nav a{color:var(--mut);text-decoration:none}nav a:hover{color:var(--g)}
+.btn{display:inline-block;padding:10px 20px;border:1px solid var(--g);color:var(--g);border-radius:99px;text-decoration:none;font-family:system-ui,sans-serif;cursor:pointer;background:none}.btn:hover{background:var(--g);color:#000}
+.hero{min-height:88vh;display:flex;flex-direction:column;justify-content:center;padding:0 8vw;background:radial-gradient(ellipse at 70% 30%,#3a2e0a 0%,#0c0a03 60%)}
+.hero small{color:var(--g);letter-spacing:.3em;font-family:system-ui,sans-serif}.hero h1{font-size:clamp(2.8rem,8vw,6.5rem);line-height:1;margin:.3em 0}.hero h1 em{color:var(--g);font-weight:400}.hero p{max-width:620px;color:var(--mut);font-size:1.2rem}
+.tick{overflow:hidden;white-space:nowrap;border-block:1px solid #2a2410;padding:10px 0;color:var(--g);font-family:system-ui,sans-serif;font-size:.9rem}.tick span{display:inline-block;padding-left:100%;animation:m 40s linear infinite}@keyframes m{to{transform:translateX(-100%)}}
+section{padding:90px 8vw;max-width:1200px;margin:auto}h2{font-size:2.2rem;color:var(--g);margin:0 0 .6em;font-weight:400}
+.story p{font-size:1.35rem;max-width:760px;margin:1.6em 0;opacity:.2;transition:.8s}.story p.on{opacity:1}.story p i{color:var(--g);font-style:normal;font-family:system-ui,sans-serif;font-size:.8rem;margin-right:14px}
+.cards{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}.card{border:1px solid #2f2810;border-radius:18px;padding:26px;background:#14100430}.card h3{color:var(--g);margin:0}.card small{color:var(--mut);font-family:system-ui,sans-serif}
+.steps{display:flex;flex-wrap:wrap;gap:12px}.st{flex:1;min-width:150px;border:1px solid #2f2810;border-radius:14px;padding:16px;font-family:system-ui,sans-serif;font-size:.9rem}.st b{display:block;color:var(--g);font-size:1.6rem;font-family:Georgia}
+.sim{display:grid;gap:22px;grid-template-columns:1fr 1fr}@media(max-width:800px){.sim{grid-template-columns:1fr}}
+.score{font-size:4rem;color:var(--g);line-height:1}.runs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}.runs button{padding:14px;font-size:1.1rem;border-radius:12px;border:1px solid #3a3112;background:#1a1405;color:var(--ink);cursor:pointer;font-family:system-ui}.runs button:hover{background:var(--g);color:#000}
+.chip{display:inline-block;width:34px;height:34px;line-height:34px;text-align:center;border-radius:50%;background:#2f855a;color:#fff;margin-right:6px;font-family:system-ui,sans-serif;font-weight:700}
+figure{margin:0}.shots{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}.shots img{width:100%;border-radius:12px;border:1px solid #3a3112}.missing img{display:none}.missing:before{content:'Add docs/shots/' attr(data-f);display:block;padding:60px 10px;border:1px dashed #3a3112;border-radius:12px;color:var(--mut);text-align:center;font-family:system-ui}
+figcaption{color:var(--mut);font-family:system-ui;font-size:.85rem;margin-top:6px}footer{padding:50px 8vw;border-top:1px solid #2a2410;color:var(--mut);font-family:system-ui,sans-serif}
+</style></head><body>
+<nav><b>PITCHSIDE</b><a href="#story">Story</a><a href="#stack">The stack</a><a href="#flow">One ball</a><a href="#play">Play</a><a href="#shots">Screens</a><a class="btn" href="https://github.com/ayushi77-verma/pitchside">GitHub</a></nav>
+<header class="hero"><small>A DATABASE PROJECT FOR COLLEGE CRICKET</small><h1>Every ball.<br><em>Every database.</em></h1><p>PitchSide scores an inter-college tournament in real time. MySQL keeps the rules, MongoDB remembers every delivery, Redis tells the whole ground what just happened.</p><p><a class="btn" href="#play">Score a ball yourself</a></p></header>
+<div class="tick"><span>MySQL keeps the rules · MongoDB remembers every ball · Redis shouts it to the stands · FastAPI guards the gate · Trigger updates the points table · Undo is one click · Nothing is lost, even when the scorer slips ·</span></div>
+<section id="story" class="story"><h2>The story</h2>
+<p><i>I</i>Every college tournament has the same ending: a notebook, a WhatsApp group and an argument about the points table.</p>
+<p><i>II</i>A wrong entry can change a result. Nobody knows who typed it. Nobody can undo it.</p>
+<p><i>III</i>So we asked a different question: what if every ball was a record, every rule lived in the database, and every spectator saw the score the instant it happened?</p>
+<p><i>IV</i>That is PitchSide. Three databases, each doing the one job it is best at.</p></section>
+<section id="stack"><h2>Three databases, three jobs</h2><div class="cards">
+<div class="card"><h3>MySQL</h3><small>The rulebook</small><p>Teams, players, fixtures, users. Constraints, a view, a trigger that updates points, and a stored procedure that finishes a match inside a transaction.</p></div>
+<div class="card"><h3>MongoDB</h3><small>The memory</small><p>Every ball is a document. Aggregation pipelines turn them into strike rates, charts, Player of the Match and an audit trail.</p></div>
+<div class="card"><h3>Redis</h3><small>The loudspeaker</small><p>Live counters, a sorted-set leaderboard and pub/sub that pushes each ball to every open screen over a WebSocket.</p></div></div></section>
+<section id="flow"><h2>One ball, five steps</h2><div class="steps"><div class="st"><b>1</b>Scorer taps a 6</div><div class="st"><b>2</b>API checks login, role and rules</div><div class="st"><b>3</b>MongoDB saves the ball</div><div class="st"><b>4</b>Redis updates the live score</div><div class="st"><b>5</b>Every screen updates instantly</div></div></section>
+<section id="play"><h2>Try it: a three-over simulator</h2><p style="color:var(--mut)">This runs in your browser. The real platform runs on three databases; see the repository to run it.</p>
+<div class="sim"><div class="card"><div class="score" id="sc">0/0</div><div id="ov" style="color:var(--mut)">0.0 overs</div><p id="msg" style="min-height:3em">Tap a button to bowl the first ball.</p><div id="chips"></div>
+<div class="runs"><button onclick="hit('0')">0</button><button onclick="hit('1')">1</button><button onclick="hit('2')">2</button><button onclick="hit('3')">3</button><button onclick="hit('4')">4</button><button onclick="hit('6')">6</button><button onclick="hit('W')">W</button><button onclick="hit('Wd')">Wd</button></div>
+<p><button class="btn" onclick="reset()">New innings</button></p></div><div class="card"><canvas id="ch" height="220"></canvas></div></div></section>
+<section id="shots"><h2>The platform</h2><div class="shots">
+<figure data-f="dashboard.png"><img src="shots/dashboard.png" alt="Dashboard" onerror="this.parentNode.classList.add('missing')"><figcaption>Tournament dashboard</figcaption></figure>
+<figure data-f="live.png"><img src="shots/live.png" alt="Live" onerror="this.parentNode.classList.add('missing')"><figcaption>Live match centre</figcaption></figure>
+<figure data-f="scorer.png"><img src="shots/scorer.png" alt="Scorer" onerror="this.parentNode.classList.add('missing')"><figcaption>Scorer console</figcaption></figure>
+<figure data-f="analytics.png"><img src="shots/analytics.png" alt="Analytics" onerror="this.parentNode.classList.add('missing')"><figcaption>Analytics and scorecard</figcaption></figure></div></section>
+<footer>Built by Ayushi Verma · B.Tech CSE, Manipal University Jaipur · RDBMS Fast Learner project · <a style="color:var(--g)" href="https://github.com/ayushi77-verma/pitchside">Source code</a></footer>
+<script>
+const io=new IntersectionObserver(e=>e.forEach(x=>x.isIntersecting&&x.target.classList.add('on')),{threshold:.6});document.querySelectorAll('.story p').forEach(p=>io.observe(p));
+const say={'0':['Dot ball. Good length.','Defended back to the bowler.'],'1':['Pushed for a single.','Worked away for one.'],'2':['Two! Great running.'],'3':['Three runs, superb placement.'],'4':['FOUR! Crashed through the covers.','FOUR! Races to the rope.'],'6':['SIX! Out of the ground!','SIX! Into the stands.'],W:['OUT! Clean bowled.','OUT! Caught in the deep.'],Wd:['Wide ball. One extra.']};
+const col={W:'#c0392b','6':'#8a6d00','4':'#b8860b','0':'#6b6450',Wd:'#d98e04'};let S,CH;
+function reset(){S={r:0,w:0,b:0,per:[0,0,0],last:[],msg:'New innings. Tap a button to bowl.'};draw()}
+function hit(k){if(S.b>=18||S.w>=5)return;const r=k=='W'?0:k=='Wd'?1:+k;S.r+=r;if(k=='W')S.w++;if(k!='Wd')S.b++;
+ S.per[Math.min(2,Math.floor((k=='Wd'?S.b:S.b-1)/6))]+=r;S.last.unshift(k);S.last=S.last.slice(0,6);const a=say[k];S.msg=a[Math.floor(Math.random()*a.length)];
+ if(S.b>=18||S.w>=5)S.msg+=' Innings over: '+S.r+'/'+S.w+'.';draw()}
+function draw(){document.getElementById('sc').textContent=S.r+'/'+S.w;document.getElementById('ov').textContent=Math.floor(S.b/6)+'.'+S.b%6+' overs · run rate '+(S.b?(S.r*6/S.b).toFixed(2):'0.00');
+ document.getElementById('msg').textContent=S.msg;document.getElementById('chips').innerHTML=S.last.map(k=>`<span class="chip" style="background:${col[k]||'#2f855a'}">${k}</span>`).join('');
+ if(window.Chart){if(!CH)CH=new Chart(document.getElementById('ch'),{type:'bar',data:{labels:['Over 1','Over 2','Over 3'],datasets:[{label:'Runs per over',data:S.per,backgroundColor:'#e8c963'}]},options:{plugins:{legend:{labels:{color:'#f7f0d8'}}},scales:{x:{ticks:{color:'#a79a6a'}},y:{ticks:{color:'#a79a6a'},beginAtZero:true}}}});else{CH.data.datasets[0].data=S.per;CH.update()}}}
+reset();
+</script></body></html>
