@@ -22,7 +22,7 @@ admin-created scorer accounts, audit trail, CSV export, system health with EXPLA
 1. Install **Python 3.12**, **MySQL 8** and create free **MongoDB Atlas** and **Redis Cloud** databases.
 2. Clone and install:
    ```
-   git clone https://github.com/YOUR-USERNAME/pitchside.git
+   git clone https://github.com/ayushi77-verma/pitchside.git
    cd pitchside
    python -m venv venv
    venv\Scripts\activate
